@@ -20,8 +20,9 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function ProfileSettings() {
-  const { profile, setProfile } = useUserStore()
+  const { profile, setProfile, user } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
@@ -33,6 +34,48 @@ export function ProfileSettings() {
       phone: profile?.phone || '',
     },
   })
+
+  // Load profile if not in store
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!profile) {
+        setIsLoadingProfile(true)
+        try {
+          const supabase = createClient()
+          
+          // Get user from session if not in store
+          let userId = user?.id
+          if (!userId) {
+            const { data: { user: sessionUser } } = await supabase.auth.getUser()
+            if (sessionUser) {
+              userId = sessionUser.id
+            } else {
+              setIsLoadingProfile(false)
+              return
+            }
+          }
+
+          if (userId) {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', userId)
+              .single()
+
+            if (!profileError && profileData) {
+              setProfile(profileData)
+            }
+          }
+        } catch (err) {
+          console.error('Error loading profile:', err)
+        } finally {
+          setIsLoadingProfile(false)
+        }
+      }
+    }
+
+    loadProfile()
+  }, [profile, user, setProfile])
 
   // Update form when profile changes
   useEffect(() => {
@@ -92,6 +135,24 @@ export function ProfileSettings() {
       setError('An unexpected error occurred. Please try again.')
       setIsLoading(false)
     }
+  }
+
+  if (isLoadingProfile) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile Settings</CardTitle>
+          <CardDescription>
+            Update your personal information and business details
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="py-8 text-center text-sm text-muted-foreground">
+            Loading profile...
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (

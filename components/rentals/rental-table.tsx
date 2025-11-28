@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Calendar, DollarSign, Package, User } from 'lucide-react'
+import { Calendar, DollarSign, Package, User, Eye } from 'lucide-react'
 import { type Rental } from '@/types'
 import {
   Table,
@@ -13,6 +13,11 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface RentalTableProps {
   rentals: Rental[]
@@ -113,9 +118,18 @@ export function RentalTable({ rentals }: RentalTableProps) {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button asChild variant="outline" size="sm">
-                      <Link href={`/rentals/${rental.id}`}>View</Link>
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button asChild variant="outline" size="icon-sm" aria-label="View rental">
+                          <Link href={`/rentals/${rental.id}`}>
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </TableCell>
               </TableRow>

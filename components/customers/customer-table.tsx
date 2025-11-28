@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Mail, Phone, MapPin, User } from 'lucide-react'
+import { Mail, Phone, MapPin, User, Eye, Pencil } from 'lucide-react'
 import { type Customer } from '@/types'
 import {
   Table,
@@ -13,6 +13,11 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface CustomerTableProps {
   customers: Customer[]
@@ -112,12 +117,30 @@ export function CustomerTable({ customers }: CustomerTableProps) {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/customers/${customer.id}`}>View</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/customers/${customer.id}/edit`}>Edit</Link>
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button asChild variant="outline" size="icon-sm" aria-label="View customer">
+                        <Link href={`/customers/${customer.id}`}>
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>View</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button asChild variant="outline" size="icon-sm" aria-label="Edit customer">
+                        <Link href={`/customers/${customer.id}/edit`}>
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Edit</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </TableCell>
             </TableRow>
