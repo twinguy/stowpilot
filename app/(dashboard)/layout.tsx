@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { DashboardLayoutClient } from '@/components/layouts/dashboard-layout-client'
 
 export default async function DashboardLayout({
   children,
@@ -15,18 +16,19 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.id)
+    .single()
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <h1 className="text-xl font-semibold">StowPilot</h1>
-          <nav className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user.email}</span>
-          </nav>
-        </div>
-      </header>
-      <main className="flex-1">{children}</main>
-    </div>
+    <DashboardLayoutClient
+      userEmail={user.email}
+      userName={profile?.full_name || undefined}
+    >
+      {children}
+    </DashboardLayoutClient>
   )
 }
 

@@ -17,7 +17,7 @@ async function DashboardContent() {
     .single()
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6 lg:pt-8">
       <div>
         <h1 className="text-3xl font-bold">Welcome{profile?.full_name ? `, ${profile.full_name}` : ''}</h1>
         <p className="text-muted-foreground mt-2">

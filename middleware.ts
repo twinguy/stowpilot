@@ -42,7 +42,7 @@ export async function middleware(request: NextRequest) {
 
   // Protected routes
   const protectedPaths = [
-    '/dashboard',
+    '/',
     '/facilities',
     '/units',
     '/customers',
@@ -50,6 +50,7 @@ export async function middleware(request: NextRequest) {
     '/billing',
     '/maintenance',
     '/reports',
+    '/settings',
   ]
   const authPaths = ['/login', '/register', '/forgot-password', '/reset-password']
   const isProtectedPath = protectedPaths.some((path) =>
@@ -70,7 +71,7 @@ export async function middleware(request: NextRequest) {
   // Redirect to dashboard if accessing auth routes while authenticated
   if (isAuthPath && user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/'
     return NextResponse.redirect(url)
   }
 
