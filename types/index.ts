@@ -214,3 +214,147 @@ export interface RentalFilters {
   facility_id?: string
 }
 
+// Payment and Billing Types
+export type PaymentMethodType = 'credit_card' | 'ach' | 'cash' | 'check'
+export type PaymentMethodStatus = 'active' | 'expired' | 'failed'
+export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded'
+export type LedgerEntryType = 'income' | 'expense' | 'adjustment'
+
+export interface PaymentMethod {
+  id: string
+  customer_id: string
+  type: PaymentMethodType
+  provider: string
+  provider_payment_method_id: string | null
+  last_four: string | null
+  expiry_month: number | null
+  expiry_year: number | null
+  is_default: boolean
+  status: PaymentMethodStatus
+  created_at: string
+}
+
+export interface Invoice {
+  id: string
+  customer_id: string
+  rental_id: string | null
+  invoice_number: string
+  period_start: string
+  period_end: string
+  amount_due: number
+  amount_paid: number
+  status: InvoiceStatus
+  due_date: string
+  paid_at: string | null
+  payment_method_id: string | null
+  stripe_invoice_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Payment {
+  id: string
+  invoice_id: string
+  customer_id: string
+  amount: number
+  payment_method_id: string | null
+  transaction_id: string | null
+  status: PaymentStatus
+  processed_at: string | null
+  notes: string | null
+  created_at: string
+}
+
+export interface LedgerEntry {
+  id: string
+  owner_id: string
+  facility_id: string | null
+  customer_id: string | null
+  rental_id: string | null
+  type: LedgerEntryType
+  category: string
+  description: string
+  amount: number
+  date: string
+  payment_id: string | null
+  created_at: string
+}
+
+export interface InvoiceFilters {
+  search?: string
+  status?: InvoiceStatus[]
+  customer_id?: string
+  rental_id?: string
+  due_date_from?: string
+  due_date_to?: string
+}
+
+export interface PaymentFilters {
+  search?: string
+  status?: PaymentStatus[]
+  customer_id?: string
+  invoice_id?: string
+  date_from?: string
+  date_to?: string
+}
+
+export interface LedgerFilters {
+  type?: LedgerEntryType[]
+  category?: string
+  facility_id?: string
+  customer_id?: string
+  rental_id?: string
+  date_from?: string
+  date_to?: string
+}
+
+// Reporting and Analytics Types
+export interface OccupancyData {
+  facility_id: string
+  facility_name: string
+  total_units: number
+  occupied_units: number
+  available_units: number
+  reserved_units: number
+  maintenance_units: number
+  occupancy_rate: number
+}
+
+export interface RevenueData {
+  date: string
+  income: number
+  expenses: number
+  net: number
+}
+
+export interface MaintenanceMetrics {
+  total_requests: number
+  open_requests: number
+  completed_requests: number
+  average_completion_time: number | null
+  total_cost: number
+  requests_by_status: Record<string, number>
+  requests_by_category: Record<string, number>
+  requests_by_urgency: Record<string, number>
+}
+
+export interface AnalyticsMetrics {
+  total_facilities: number
+  total_units: number
+  total_customers: number
+  active_rentals: number
+  total_revenue: number
+  total_expenses: number
+  net_profit: number
+  average_occupancy_rate: number
+  total_maintenance_requests: number
+}
+
+export interface ReportFilters {
+  date_from?: string
+  date_to?: string
+  facility_id?: string
+  group_by?: 'day' | 'week' | 'month' | 'year'
+}
+

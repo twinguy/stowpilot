@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Calendar, DollarSign, Package, User, Eye } from 'lucide-react'
+import { Calendar, DollarSign, Package, User, Eye, Pencil } from 'lucide-react'
 import { type Rental } from '@/types'
 import {
   Table,
@@ -128,6 +128,18 @@ export function RentalTable({ rentals }: RentalTableProps) {
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>View</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button asChild variant="outline" size="icon-sm" aria-label="Edit rental">
+                          <Link href={`/rentals/${rental.id}/edit`}>
+                            <Pencil className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Edit</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>

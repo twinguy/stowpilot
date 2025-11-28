@@ -39,6 +39,8 @@ interface RentalWizardProps {
   customers: Customer[]
   units: Unit[]
   onSubmit: (data: RentalFormData) => Promise<void>
+  defaultValues?: RentalFormData
+  isEditMode?: boolean
 }
 
 const steps = [
@@ -48,7 +50,13 @@ const steps = [
   { id: 4, name: 'Review', icon: CheckCircle2 },
 ]
 
-export function RentalWizard({ customers, units, onSubmit }: RentalWizardProps) {
+export function RentalWizard({
+  customers,
+  units,
+  onSubmit,
+  defaultValues,
+  isEditMode = false,
+}: RentalWizardProps) {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -56,7 +64,7 @@ export function RentalWizard({ customers, units, onSubmit }: RentalWizardProps) 
 
   const form = useForm<RentalFormData>({
     resolver: zodResolver(rentalFormSchema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       customer_id: '',
       unit_id: '',
       start_date: new Date().toISOString().split('T')[0],
@@ -77,15 +85,15 @@ export function RentalWizard({ customers, units, onSubmit }: RentalWizardProps) 
   const selectedUnit = form.watch('unit_id')
   const insuranceRequired = form.watch('insurance_required')
 
-  // Auto-populate monthly rate from selected unit
+  // Auto-populate monthly rate from selected unit (only in create mode)
   useEffect(() => {
-    if (selectedUnit) {
+    if (selectedUnit && !isEditMode) {
       const unit = units.find((u) => u.id === selectedUnit)
       if (unit && form.getValues('monthly_rate') === 0) {
         form.setValue('monthly_rate', unit.monthly_rate)
       }
     }
-  }, [selectedUnit, units, form])
+  }, [selectedUnit, units, form, isEditMode])
 
   const customer = customers.find((c) => c.id === selectedCustomer)
   const selectedUnitData = units.find((u) => u.id === selectedUnit)
@@ -114,7 +122,10 @@ export function RentalWizard({ customers, units, onSubmit }: RentalWizardProps) 
     return result
   }
 
-  const handleNext = async () => {
+  const handleNext = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+    }
     const isValid = await validateStep(currentStep)
     if (isValid) {
       setCurrentStep((prev) => Math.min(prev + 1, steps.length))
@@ -133,7 +144,10 @@ export function RentalWizard({ customers, units, onSubmit }: RentalWizardProps) 
 
     try {
       await onSubmit(data)
-      router.push('/rentals')
+      // Navigation is handled by the parent component (RentalEditForm or NewRentalPage)
+      if (!isEditMode) {
+        router.push('/rentals')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
       setIsLoading(false)
@@ -185,17 +199,25 @@ export function RentalWizard({ customers, units, onSubmit }: RentalWizardProps) 
                     </FormControl>
                     <SelectContent>
                       {units
-                        .filter((u) => u.status === 'available' || u.status === 'reserved')
+                        .filter((u) => {
+                          if (isEditMode && defaultValues?.unit_id === u.id) {
+                            return true // Always show the current unit in edit mode
+                          }
+                          return u.status === 'available' || u.status === 'reserved'
+                        })
                         .map((unit) => (
                           <SelectItem key={unit.id} value={unit.id}>
                             {unit.unit_number} - ${unit.monthly_rate}/month
                             {unit.status === 'reserved' && ' (Reserved)'}
+                            {unit.status === 'occupied' && isEditMode && defaultValues?.unit_id === unit.id && ' (Current)'}
                           </SelectItem>
                         ))}
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    Only available and reserved units are shown
+                    {isEditMode
+                      ? 'You can change the unit or keep the current one'
+                      : 'Only available and reserved units are shown'}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -556,7 +578,16 @@ export function RentalWizard({ customers, units, onSubmit }: RentalWizardProps) 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          // Only allow submission from the submit button on the review step
+          if (currentStep === steps.length) {
+            form.handleSubmit(handleSubmit)(e)
+          }
+        }}
+        className="space-y-6"
+      >
         {/* Step Indicator */}
         <div className="flex items-center justify-between mb-8">
           {steps.map((step, index) => {
@@ -630,13 +661,26 @@ export function RentalWizard({ customers, units, onSubmit }: RentalWizardProps) 
           </Button>
 
           {currentStep < steps.length ? (
-            <Button type="button" onClick={handleNext} disabled={isLoading}>
+            <Button type="button" onClick={(e) => handleNext(e)} disabled={isLoading}>
               Next
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create Rental Agreement'}
+            <Button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                form.handleSubmit(handleSubmit)(e)
+              }}
+              disabled={isLoading}
+            >
+              {isLoading
+                ? isEditMode
+                  ? 'Updating...'
+                  : 'Creating...'
+                : isEditMode
+                  ? 'Update Rental Agreement'
+                  : 'Create Rental Agreement'}
             </Button>
           )}
         </div>
