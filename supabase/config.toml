@@ -1,0 +1,57 @@
+# Supabase Configuration
+# This file configures the Supabase local development environment
+
+[project]
+# Project ID (set when linking to a remote project)
+# id = "your-project-id"
+
+[auth]
+# Auth configuration
+enabled = true
+# External URL for auth callbacks (set in production)
+# external_url = "https://your-domain.com"
+
+[api]
+# API configuration
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+# Database configuration
+port = 54322
+# Database password (for local development)
+# password = "postgres"
+# Major version of Postgres
+major_version = 15
+
+[studio]
+# Supabase Studio configuration
+enabled = true
+port = 54323
+# External URL for Studio (set in production)
+# external_url = "https://studio.your-domain.com"
+
+[inbucket]
+# Email testing configuration
+enabled = true
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[storage]
+# Storage configuration
+enabled = true
+file_size_limit = "50MiB"
+
+[edge_runtime]
+# Edge Functions configuration
+enabled = true
+inspector_port = 8083
+
+[analytics]
+# Analytics configuration
+enabled = false
+

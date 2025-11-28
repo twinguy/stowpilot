@@ -1,0 +1,113 @@
+import { Suspense } from 'react'
+import { createClient } from '@/lib/supabase/server'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+
+async function DashboardContent() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user?.id)
+    .single()
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Welcome{profile?.full_name ? `, ${profile.full_name}` : ''}</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your self-storage facilities from one place
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Facilities</CardTitle>
+            <CardDescription>Manage your storage facilities</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">0</p>
+            <p className="text-sm text-muted-foreground">No facilities yet</p>
+            <Button asChild className="mt-4 w-full">
+              <Link href="/facilities/new">Add Facility</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Units</CardTitle>
+            <CardDescription>Track unit inventory</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">0</p>
+            <p className="text-sm text-muted-foreground">No units yet</p>
+            <Button asChild variant="outline" className="mt-4 w-full">
+              <Link href="/units">View Units</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Customers</CardTitle>
+            <CardDescription>Manage customer relationships</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">0</p>
+            <p className="text-sm text-muted-foreground">No customers yet</p>
+            <Button asChild variant="outline" className="mt-4 w-full">
+              <Link href="/customers/new">Add Customer</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {profile && !profile.business_name && (
+        <Card className="border-primary">
+          <CardHeader>
+            <CardTitle>Complete Your Profile</CardTitle>
+            <CardDescription>
+              Add your business information to get started
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href="/settings">Go to Settings</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+export default function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { onboarding?: string }
+}) {
+  return (
+    <div>
+      {searchParams.onboarding === 'true' && (
+        <div className="bg-primary/10 border-b border-primary/20 p-4">
+          <div className="container mx-auto">
+            <p className="text-sm text-primary">
+              🎉 Welcome to StowPilot! Get started by adding your first facility.
+            </p>
+          </div>
+        </div>
+      )}
+      <Suspense fallback={<div className="container mx-auto p-6">Loading...</div>}>
+        <DashboardContent />
+      </Suspense>
+    </div>
+  )
+}
+
