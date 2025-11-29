@@ -16,7 +16,7 @@ async function getDashboardCounts(userId: string) {
     .eq('owner_id', userId)
 
   const facilitiesCount = userFacilities?.length || 0
-  const facilityIds = userFacilities?.map(f => f.id) || []
+  const facilityIds = (userFacilities as { id: string }[] | null)?.map(f => f.id) || []
   
   // Count units in those facilities
   let unitsCount = 0
