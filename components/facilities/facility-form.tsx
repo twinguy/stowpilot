@@ -290,6 +290,7 @@ export function FacilityForm({ facility, onSubmit }: FacilityFormProps) {
                   placeholder="Additional notes about this facility..."
                   className="min-h-[100px]"
                   {...field}
+                  value={field.value || ''}
                 />
               </FormControl>
               <FormDescription>Optional notes about this facility</FormDescription>

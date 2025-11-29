@@ -72,10 +72,12 @@ export function UnitForm({ unit, facilities, onSubmit }: UnitFormProps) {
         },
   })
 
-  const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({
+  // Type assertion needed: react-hook-form type inference issue with zod array schemas
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { fields: featureFields, append: appendFeature, remove: removeFeature } = (useFieldArray as any)({
     control: form.control,
     name: 'features',
-  })
+  }) as { fields: Array<{ id: string; value: string }>; append: (value: string) => void; remove: (index: number) => void }
 
   // Calculate square feet when width or length changes
   const width = form.watch('size.width')

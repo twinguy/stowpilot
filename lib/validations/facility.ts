@@ -6,7 +6,7 @@ export const addressSchema = z.object({
   city: z.string().min(1, 'City is required'),
   state: z.string().min(2, 'State is required').max(2, 'State must be 2 characters'),
   zip: z.string().min(1, 'ZIP code is required').regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code format'),
-  country: z.string().optional().default('US'),
+  country: z.string().min(1, 'Country is required'),
   coordinates: z
     .object({
       lat: z.number().min(-90).max(90),
@@ -45,19 +45,17 @@ export const operatingHoursSchema = z
 export const facilityFormSchema = z.object({
   name: z.string().min(1, 'Facility name is required').max(255, 'Name is too long'),
   address: addressSchema,
-  amenities: z
-    .array(
-      z.object({
-        name: z.string().min(1, 'Amenity name is required'),
-        description: z.string().optional(),
-      })
-    )
-    .default([]),
+  amenities: z.array(
+    z.object({
+      name: z.string().min(1, 'Amenity name is required'),
+      description: z.string().optional(),
+    })
+  ),
   contact_info: contactInfoSchema,
   operating_hours: operatingHoursSchema,
-  photos: z.array(z.string().url('Invalid photo URL')).default([]),
+  photos: z.array(z.string().url('Invalid photo URL')),
   notes: z.string().optional().nullable(),
-  status: z.enum(['active', 'inactive', 'maintenance']).default('active'),
+  status: z.enum(['active', 'inactive', 'maintenance']),
 })
 
 export type FacilityFormData = z.infer<typeof facilityFormSchema>

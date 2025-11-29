@@ -8,14 +8,14 @@ export const rentalFormSchema = z
     start_date: z.string().min(1, 'Start date is required'),
     end_date: z.string().optional().nullable(),
     monthly_rate: z.number().positive('Monthly rate must be positive'),
-    security_deposit: z.number().min(0, 'Security deposit cannot be negative').default(0),
-    late_fee_rate: z.number().min(0, 'Late fee rate cannot be negative').default(0),
-    auto_renew: z.boolean().default(true),
-    insurance_required: z.boolean().default(false),
+    security_deposit: z.number().min(0, 'Security deposit cannot be negative'),
+    late_fee_rate: z.number().min(0, 'Late fee rate cannot be negative'),
+    auto_renew: z.boolean(),
+    insurance_required: z.boolean(),
     insurance_provider: z.string().optional().nullable(),
     insurance_policy_number: z.string().optional().nullable(),
     special_terms: z.string().optional().nullable(),
-    status: z.enum(['draft', 'pending_signature', 'active', 'terminated', 'expired']).default('draft'),
+    status: z.enum(['draft', 'pending_signature', 'active', 'terminated', 'expired']),
   })
   .refine(
     (data) => {
