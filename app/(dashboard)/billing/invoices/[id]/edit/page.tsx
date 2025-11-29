@@ -77,16 +77,18 @@ async function updateInvoice(id: string, data: InvoiceFormData) {
   }
 
   // Verify invoice ownership
-  const { data: existingInvoice } = await supabase
+  const { data: existingInvoiceData } = await supabase
     .from('invoices')
     .select('*, customers!inner(owner_id)')
     .eq('id', id)
     .eq('customers.owner_id', user.id)
     .single()
 
-  if (!existingInvoice) {
+  if (!existingInvoiceData) {
     throw new Error('Invoice not found')
   }
+
+  const existingInvoice = existingInvoiceData as Invoice
 
   // Verify customer ownership if changed
   if (data.customer_id !== existingInvoice.customer_id) {

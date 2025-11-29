@@ -25,7 +25,7 @@ port = 54322
 # Database password (for local development)
 # password = "postgres"
 # Major version of Postgres
-major_version = 15
+major_version = 17
 
 [studio]
 # Supabase Studio configuration
