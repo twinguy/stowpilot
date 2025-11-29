@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { User, LogOut, Settings, ChevronDown, Menu, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,6 +59,7 @@ export function DashboardHeader({
         </Button>
       )}
       <div className="flex flex-1 items-center justify-end gap-4">
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2">
