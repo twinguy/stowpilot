@@ -83,7 +83,8 @@ async function createInvoice(data: InvoiceFormData) {
     }
   }
 
-  const { error } = await supabase.from('invoices').insert({
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('invoices') as any).insert({
     customer_id: data.customer_id,
     rental_id: data.rental_id || null,
     invoice_number: data.invoice_number,

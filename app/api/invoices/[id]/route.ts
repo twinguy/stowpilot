@@ -113,8 +113,8 @@ export async function PATCH(
       updateData.paid_at = validatedData.paid_at
     }
 
-    const { data, error } = await supabase
-      .from('invoices')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('invoices') as any)
       .update(updateData)
       .eq('id', id)
       .select()
@@ -165,7 +165,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
     }
 
-    const { error } = await supabase.from('invoices').delete().eq('id', id)
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { error } = await (supabase.from('invoices') as any).delete().eq('id', id)
 
     if (error) {
       throw error
