@@ -77,16 +77,18 @@ async function updateRental(id: string, data: RentalFormData) {
   }
 
   // Verify rental ownership
-  const { data: existingRental } = await supabase
-    .from('rentals')
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { data: existingRentalData } = await (supabase.from('rentals') as any)
     .select('id, unit_id')
     .eq('id', id)
     .eq('owner_id', user.id)
     .single()
 
-  if (!existingRental) {
+  if (!existingRentalData) {
     throw new Error('Rental not found')
   }
+
+  const existingRental = existingRentalData as { id: string; unit_id: string }
 
   // Verify customer and unit ownership
   const { data: customer } = await supabase
