@@ -57,7 +57,8 @@ async function bulkImportUnits(data: BulkUnitImportData) {
     photos: unit.photos || [],
   }))
 
-  const { error } = await supabase.from('units').insert(unitsToInsert)
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('units') as any).insert(unitsToInsert)
 
   if (error) {
     throw new Error(error.message)

@@ -14,8 +14,8 @@ export async function updateFacilityAction(id: string, data: FacilityFormData) {
     throw new Error('Unauthorized')
   }
 
-  const { error } = await supabase
-    .from('facilities')
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('facilities') as any)
     .update({
       name: data.name,
       address: data.address,

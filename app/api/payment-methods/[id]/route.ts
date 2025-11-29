@@ -164,7 +164,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Payment method not found' }, { status: 404 })
     }
 
-    const { error } = await supabase.from('payment_methods').delete().eq('id', id)
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { error } = await (supabase.from('payment_methods') as any).delete().eq('id', id)
 
     if (error) {
       throw error

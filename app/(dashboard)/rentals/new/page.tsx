@@ -81,7 +81,8 @@ async function createRental(data: RentalFormData) {
   }
 
   // Create rental
-  const { error } = await supabase.from('rentals').insert({
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('rentals') as any).insert({
     owner_id: user.id,
     customer_id: data.customer_id,
     unit_id: data.unit_id,
@@ -104,7 +105,7 @@ async function createRental(data: RentalFormData) {
 
   // Update unit status to occupied if rental is active
   if (data.status === 'active') {
-    await supabase.from('units').update({ status: 'occupied' }).eq('id', data.unit_id)
+    await (supabase.from('units') as any).update({ status: 'occupied' }).eq('id', data.unit_id)
   }
 
   // Revalidate pages

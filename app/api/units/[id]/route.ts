@@ -119,7 +119,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unit not found' }, { status: 404 })
     }
 
-    const { error } = await supabase.from('units').delete().eq('id', id)
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { error } = await (supabase.from('units') as any).delete().eq('id', id)
 
     if (error) {
       throw error

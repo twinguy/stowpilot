@@ -142,7 +142,8 @@ export async function DELETE(
     }
 
     // Delete rental
-    const { error } = await supabase.from('rentals').delete().eq('id', id)
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { error } = await (supabase.from('rentals') as any).delete().eq('id', id)
 
     if (error) {
       throw error

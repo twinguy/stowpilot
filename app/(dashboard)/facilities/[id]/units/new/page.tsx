@@ -68,7 +68,8 @@ async function createUnit(data: UnitFormData) {
     throw new Error('Facility not found')
   }
 
-  const { error } = await supabase.from('units').insert({
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('units') as any).insert({
     facility_id: data.facility_id,
     unit_number: data.unit_number,
     size: data.size,

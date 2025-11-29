@@ -112,8 +112,8 @@ async function updateRental(id: string, data: RentalFormData) {
   }
 
   // Update rental
-  const { error } = await supabase
-    .from('rentals')
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('rentals') as any)
     .update({
       customer_id: data.customer_id,
       unit_id: data.unit_id,
@@ -138,13 +138,13 @@ async function updateRental(id: string, data: RentalFormData) {
 
   // Update unit status based on rental status
   if (data.status === 'active') {
-    await supabase.from('units').update({ status: 'occupied' }).eq('id', data.unit_id)
+    await (supabase.from('units') as any).update({ status: 'occupied' }).eq('id', data.unit_id)
     // If unit changed, free up the old unit
     if (existingRental.unit_id !== data.unit_id) {
-      await supabase.from('units').update({ status: 'available' }).eq('id', existingRental.unit_id)
+      await (supabase.from('units') as any).update({ status: 'available' }).eq('id', existingRental.unit_id)
     }
   } else if (data.status === 'terminated' || data.status === 'expired') {
-    await supabase.from('units').update({ status: 'available' }).eq('id', data.unit_id)
+    await (supabase.from('units') as any).update({ status: 'available' }).eq('id', data.unit_id)
   }
 
   // Revalidate pages

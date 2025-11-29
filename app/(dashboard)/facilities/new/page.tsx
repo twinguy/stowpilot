@@ -16,7 +16,8 @@ async function createFacility(data: FacilityFormData) {
     throw new Error('Unauthorized')
   }
 
-  const { error } = await supabase.from('facilities').insert({
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('facilities') as any).insert({
     owner_id: user.id,
     name: data.name,
     address: data.address,
