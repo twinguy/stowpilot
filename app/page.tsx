@@ -85,9 +85,20 @@ export default async function HomePage({
   searchParams: Promise<{ onboarding?: string }>
 }) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const sessionPromise = supabase.auth.getSession()
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Session check timeout')), 5000)
+    )
+
+    const {
+      data: { session },
+    } = await Promise.race([sessionPromise, timeoutPromise])
+    user = session?.user
+  } catch (error) {
+    console.warn('Supabase connection failed in page:', error)
+  }
 
   if (!user) {
     redirect('/login')

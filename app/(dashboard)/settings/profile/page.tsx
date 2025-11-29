@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ProfileSettings } from '@/components/settings/profile-settings'
+import { PasswordChangeForm } from '@/components/settings/password-change-form'
 
 export default async function ProfileSettingsPage() {
   const supabase = await createClient()
@@ -20,6 +21,8 @@ export default async function ProfileSettingsPage() {
       </div>
 
       <ProfileSettings />
+      
+      <PasswordChangeForm />
     </div>
   )
 }

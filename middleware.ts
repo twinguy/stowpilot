@@ -2,6 +2,24 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // Skip middleware for API routes (except auth callback)
+  if (request.nextUrl.pathname.startsWith('/api/') && !request.nextUrl.pathname.startsWith('/api/auth/callback')) {
+    return NextResponse.next()
+  }
+
+  // Define route categories first
+  const authPaths = ['/login', '/register', '/forgot-password', '/reset-password']
+  
+  // For auth paths, skip all Supabase checks to prevent hanging
+  const isAuthPath = authPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  )
+  
+  if (isAuthPath) {
+    // Allow auth pages to load without any Supabase checks
+    return NextResponse.next()
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -35,11 +53,6 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session if expired - required for Server Components
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
   // Protected routes
   const protectedPaths = [
     '/',
@@ -52,11 +65,24 @@ export async function middleware(request: NextRequest) {
     '/reports',
     '/settings',
   ]
-  const authPaths = ['/login', '/register', '/forgot-password', '/reset-password']
+
+  // Refresh session if expired - required for Server Components
+  let user = null
+  try {
+    // Add timeout to prevent hanging
+    const sessionPromise = supabase.auth.getSession()
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Session check timeout')), 2000)
+    )
+
+    const result = await Promise.race([sessionPromise, timeoutPromise])
+    user = result?.data?.session?.user || null
+  } catch (error) {
+    // If Supabase is not accessible or times out, treat as unauthenticated
+    console.warn('Supabase connection failed in middleware:', error)
+    user = null
+  }
   const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  )
-  const isAuthPath = authPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   )
 
@@ -64,14 +90,6 @@ export async function middleware(request: NextRequest) {
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    url.searchParams.set('redirect', request.nextUrl.pathname)
-    return NextResponse.redirect(url)
-  }
-
-  // Redirect to dashboard if accessing auth routes while authenticated
-  if (isAuthPath && user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
     return NextResponse.redirect(url)
   }
 
