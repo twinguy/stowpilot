@@ -6,7 +6,37 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
-async function DashboardContent({ profile }: { profile: any }) {
+async function getDashboardCounts(userId: string) {
+  const supabase = await createClient()
+  
+  // Get all facility IDs owned by the user (we'll use this for both counts)
+  const { data: userFacilities } = await supabase
+    .from('facilities')
+    .select('id')
+    .eq('owner_id', userId)
+
+  const facilitiesCount = userFacilities?.length || 0
+  const facilityIds = userFacilities?.map(f => f.id) || []
+  
+  // Count units in those facilities
+  let unitsCount = 0
+  if (facilityIds.length > 0) {
+    const { count } = await supabase
+      .from('units')
+      .select('*', { count: 'exact', head: true })
+      .in('facility_id', facilityIds)
+    unitsCount = count || 0
+  }
+
+  return {
+    facilitiesCount,
+    unitsCount,
+  }
+}
+
+async function DashboardContent({ profile, userId }: { profile: any; userId: string }) {
+  const { facilitiesCount, unitsCount } = await getDashboardCounts(userId)
+
   return (
     <div className="container mx-auto p-6 space-y-6 lg:pt-8">
       <div>
@@ -23,8 +53,10 @@ async function DashboardContent({ profile }: { profile: any }) {
             <CardDescription>Manage your storage facilities</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-sm text-muted-foreground">No facilities yet</p>
+            <p className="text-2xl font-bold">{facilitiesCount}</p>
+            <p className="text-sm text-muted-foreground">
+              {facilitiesCount === 0 ? 'No facilities yet' : `${facilitiesCount} ${facilitiesCount === 1 ? 'facility' : 'facilities'}`}
+            </p>
             <Button asChild className="mt-4 w-full">
               <Link href="/facilities/new">Add Facility</Link>
             </Button>
@@ -37,8 +69,10 @@ async function DashboardContent({ profile }: { profile: any }) {
             <CardDescription>Track unit inventory</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-sm text-muted-foreground">No units yet</p>
+            <p className="text-2xl font-bold">{unitsCount}</p>
+            <p className="text-sm text-muted-foreground">
+              {unitsCount === 0 ? 'No units yet' : `${unitsCount} ${unitsCount === 1 ? 'unit' : 'units'}`}
+            </p>
             <Button asChild variant="outline" className="mt-4 w-full">
               <Link href="/units">View Units</Link>
             </Button>
@@ -125,7 +159,7 @@ export default async function HomePage({
         </div>
       )}
       <Suspense fallback={<div className="container mx-auto p-6">Loading...</div>}>
-        <DashboardContent profile={profile} />
+        <DashboardContent profile={profile} userId={user.id} />
       </Suspense>
     </DashboardLayoutClient>
   )
