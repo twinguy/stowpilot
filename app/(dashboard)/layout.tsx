@@ -25,8 +25,8 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { data: profile } = await (supabase.from('profiles') as any)
     .select('full_name')
     .eq('id', user.id)
     .single()

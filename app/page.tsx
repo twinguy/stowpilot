@@ -104,8 +104,8 @@ export default async function HomePage({
     redirect('/login')
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { data: profile } = await (supabase.from('profiles') as any)
     .select('*')
     .eq('id', user.id)
     .single()

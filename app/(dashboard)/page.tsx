@@ -10,8 +10,8 @@ async function DashboardContent() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { data: profile } = await supabase
-    .from('profiles')
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { data: profile } = await (supabase.from('profiles') as any)
     .select('*')
     .eq('id', user?.id)
     .single()
