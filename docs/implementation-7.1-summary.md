@@ -69,7 +69,7 @@ November 27, 2025
 - Real-time validation feedback
 - Loading states and error handling
 - Redirect support for protected routes
-- Multi-step registration flow
+- Multi-step registration flow.
 
 ### 5. Route Protection
 
