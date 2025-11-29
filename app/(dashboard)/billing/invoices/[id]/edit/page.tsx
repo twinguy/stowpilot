@@ -4,6 +4,9 @@ import { createClient } from '@/lib/supabase/server'
 import { InvoiceEditForm } from '@/components/billing/invoice-edit-form'
 import { type InvoiceFormData } from '@/lib/validations/invoice'
 import { type Invoice, type Customer, type Rental } from '@/types'
+import { type Database } from '@/lib/supabase/types'
+
+type InvoiceUpdate = Database['public']['Tables']['invoices']['Update']
 
 async function getInvoice(id: string): Promise<Invoice | null> {
   const supabase = await createClient()
@@ -118,21 +121,23 @@ async function updateInvoice(id: string, data: InvoiceFormData) {
     }
   }
 
-  const { error } = await supabase
-    .from('invoices')
-    .update({
-      customer_id: data.customer_id,
-      rental_id: data.rental_id || null,
-      invoice_number: data.invoice_number,
-      period_start: data.period_start,
-      period_end: data.period_end,
-      amount_due: data.amount_due,
-      due_date: data.due_date,
-      payment_method_id: data.payment_method_id || null,
-      stripe_invoice_id: data.stripe_invoice_id || null,
-      status: data.status,
-      updated_at: new Date().toISOString(),
-    })
+  const updateData: InvoiceUpdate = {
+    customer_id: data.customer_id,
+    rental_id: data.rental_id || null,
+    invoice_number: data.invoice_number,
+    period_start: data.period_start,
+    period_end: data.period_end,
+    amount_due: data.amount_due,
+    due_date: data.due_date,
+    payment_method_id: data.payment_method_id || null,
+    stripe_invoice_id: data.stripe_invoice_id || null,
+    status: data.status,
+    updated_at: new Date().toISOString(),
+  }
+
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('invoices') as any)
+    .update(updateData)
     .eq('id', id)
 
   if (error) {
