@@ -92,8 +92,8 @@ async function createUnit(data: UnitFormData) {
     .select('*', { count: 'exact', head: true })
     .eq('facility_id', data.facility_id)
 
-  await supabase
-    .from('facilities')
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  await (supabase.from('facilities') as any)
     .update({ total_units: count || 0 })
     .eq('id', data.facility_id)
 
