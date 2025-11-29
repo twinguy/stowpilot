@@ -179,6 +179,59 @@ export interface Database {
           updated_at?: string
         }
       }
+      invoices: {
+        Row: {
+          id: string
+          customer_id: string
+          rental_id: string | null
+          invoice_number: string
+          period_start: string
+          period_end: string
+          amount_due: number
+          amount_paid: number
+          status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+          due_date: string
+          paid_at: string | null
+          payment_method_id: string | null
+          stripe_invoice_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          customer_id: string
+          rental_id?: string | null
+          invoice_number: string
+          period_start: string
+          period_end: string
+          amount_due: number
+          amount_paid?: number
+          status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+          due_date: string
+          paid_at?: string | null
+          payment_method_id?: string | null
+          stripe_invoice_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          customer_id?: string
+          rental_id?: string | null
+          invoice_number?: string
+          period_start?: string
+          period_end?: string
+          amount_due?: number
+          amount_paid?: number
+          status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+          due_date?: string
+          paid_at?: string | null
+          payment_method_id?: string | null
+          stripe_invoice_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
