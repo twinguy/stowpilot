@@ -129,8 +129,8 @@ export async function POST(request: NextRequest) {
       const newAmountPaid = (invoice.amount_paid || 0) + validatedData.amount
       const invoiceStatus = newAmountPaid >= invoice.amount_due ? 'paid' : invoice.status
 
-      await supabase
-        .from('invoices')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      await (supabase.from('invoices') as any)
         .update({
           amount_paid: newAmountPaid,
           status: invoiceStatus,

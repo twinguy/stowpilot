@@ -101,8 +101,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Update facility total_units count
-      await supabase
-        .from('facilities')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      await (supabase.from('facilities') as any)
         .update({ total_units: data.length })
         .eq('id', validatedData.facility_id)
 
@@ -150,8 +150,8 @@ export async function POST(request: NextRequest) {
         .select('*', { count: 'exact', head: true })
         .eq('facility_id', validatedData.facility_id)
 
-      await supabase
-        .from('facilities')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      await (supabase.from('facilities') as any)
         .update({ total_units: count || 0 })
         .eq('id', validatedData.facility_id)
 

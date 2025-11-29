@@ -60,8 +60,8 @@ export async function PATCH(
     const body = await request.json()
     const validatedData = facilityFormSchema.partial().parse(body)
 
-    const { data, error } = await supabase
-      .from('facilities')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('facilities') as any)
       .update({
         ...validatedData,
         updated_at: new Date().toISOString(),

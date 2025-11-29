@@ -125,8 +125,8 @@ export async function PATCH(
       const totalPaid = invoicePayments?.reduce((sum, p) => sum + p.amount, 0) || 0
       const invoiceStatus = totalPaid >= invoice.amount_due ? 'paid' : invoice.status
 
-      await supabase
-        .from('invoices')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      await (supabase.from('invoices') as any)
         .update({
           amount_paid: totalPaid,
           status: invoiceStatus,

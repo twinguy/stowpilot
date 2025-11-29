@@ -68,8 +68,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unit not found' }, { status: 404 })
     }
 
-    const { data, error } = await supabase
-      .from('units')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('units') as any)
       .update({
         ...validatedData,
         updated_at: new Date().toISOString(),
@@ -132,8 +132,8 @@ export async function DELETE(
       .select('*', { count: 'exact', head: true })
       .eq('facility_id', unit.facility_id)
 
-    await supabase
-      .from('facilities')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    await (supabase.from('facilities') as any)
       .update({ total_units: count || 0 })
       .eq('id', unit.facility_id)
 

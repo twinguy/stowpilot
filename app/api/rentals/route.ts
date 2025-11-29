@@ -129,8 +129,8 @@ export async function POST(request: NextRequest) {
 
     // Update unit status to occupied if rental is active
     if (validatedData.status === 'active') {
-      await supabase
-        .from('units')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      await (supabase.from('units') as any)
         .update({ status: 'occupied' })
         .eq('id', validatedData.unit_id)
     }

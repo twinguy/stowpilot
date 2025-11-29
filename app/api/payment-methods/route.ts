@@ -81,8 +81,8 @@ export async function POST(request: NextRequest) {
 
     // If this is set as default, unset other defaults for this customer
     if (validatedData.is_default) {
-      await supabase
-        .from('payment_methods')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      await (supabase.from('payment_methods') as any)
         .update({ is_default: false })
         .eq('customer_id', validatedData.customer_id)
         .eq('is_default', true)

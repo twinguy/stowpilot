@@ -72,8 +72,8 @@ export async function PATCH(
     const validatedData = rentalFormSchema.partial().parse(body)
 
     // Update rental
-    const { data: rental, error } = await supabase
-      .from('rentals')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: rental, error } = await (supabase.from('rentals') as any)
       .update({
         ...validatedData,
         updated_at: new Date().toISOString(),
@@ -95,8 +95,8 @@ export async function PATCH(
         unitStatus = 'available'
       }
 
-      await supabase
-        .from('units')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      await (supabase.from('units') as any)
         .update({ status: unitStatus })
         .eq('id', existingRental.unit_id)
     }
@@ -150,8 +150,8 @@ export async function DELETE(
     }
 
     // Update unit status back to available
-    await supabase
-      .from('units')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    await (supabase.from('units') as any)
       .update({ status: 'available' })
       .eq('id', rental.unit_id)
 

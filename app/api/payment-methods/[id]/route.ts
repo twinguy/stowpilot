@@ -74,8 +74,8 @@ export async function PATCH(
 
     // If setting as default, unset other defaults for this customer
     if (validatedData.is_default === true) {
-      await supabase
-        .from('payment_methods')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      await (supabase.from('payment_methods') as any)
         .update({ is_default: false })
         .eq('customer_id', existingPaymentMethod.customer_id)
         .eq('is_default', true)
@@ -112,8 +112,8 @@ export async function PATCH(
       updateData.status = validatedData.status
     }
 
-    const { data, error } = await supabase
-      .from('payment_methods')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('payment_methods') as any)
       .update(updateData)
       .eq('id', id)
       .select()
