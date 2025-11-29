@@ -67,8 +67,8 @@ async function updateUnit(id: string, data: UnitFormData) {
     throw new Error('Unit not found')
   }
 
-  const { error } = await supabase
-    .from('units')
+  // Type assertion needed because TypeScript can't infer the table type from Database
+  const { error } = await (supabase.from('units') as any)
     .update({
       facility_id: data.facility_id,
       unit_number: data.unit_number,
