@@ -72,7 +72,11 @@ export function RentalTimeline({ rental }: RentalTimelineProps) {
           },
         ]
       : []),
-  ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  ].filter((event) => event.date !== null).sort((a, b) => {
+    const dateA = new Date(a.date as string).getTime()
+    const dateB = new Date(b.date as string).getTime()
+    return dateA - dateB
+  })
 
   return (
     <Card>
@@ -116,7 +120,7 @@ export function RentalTimeline({ rental }: RentalTimelineProps) {
                   <div className="flex items-center justify-between">
                     <h4 className="font-semibold">{event.label}</h4>
                     <span className="text-sm text-muted-foreground">
-                      {new Date(event.date).toLocaleDateString()}
+                      {event.date ? new Date(event.date).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">{event.description}</p>

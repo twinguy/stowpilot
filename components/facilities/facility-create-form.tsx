@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { FacilityForm } from './facility-form'
-import { type FacilityFormData } from '@/types'
+import { type FacilityFormData } from '@/lib/validations/facility'
 
 interface FacilityCreateFormProps {
   createAction: (data: FacilityFormData) => Promise<void>

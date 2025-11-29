@@ -134,14 +134,13 @@ export function RegistrationWizard() {
         }
 
         // Update profile in database
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: user.id,
-            email: user.email!,
-            full_name: step2Data.full_name,
-            business_name: step2Data.business_name || null,
-            phone: step2Data.phone || null,
+        // Type assertion needed because TypeScript can't infer the table type from Database
+        const { error: profileError } = await (supabase.from('profiles') as any).upsert({
+          id: user.id,
+          email: user.email!,
+          full_name: step2Data.full_name,
+          business_name: step2Data.business_name || null,
+          phone: step2Data.phone || null,
           })
 
         if (profileError) {

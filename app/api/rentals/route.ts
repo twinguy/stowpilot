@@ -102,15 +102,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Create rental
-    const { data: rental, error } = await supabase
-      .from('rentals')
-      .insert({
-        owner_id: user.id,
-        customer_id: validatedData.customer_id,
-        unit_id: validatedData.unit_id,
-        start_date: validatedData.start_date,
-        end_date: validatedData.end_date,
-        monthly_rate: validatedData.monthly_rate,
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: rental, error } = await (supabase.from('rentals') as any).insert({
+      owner_id: user.id,
+      customer_id: validatedData.customer_id,
+      unit_id: validatedData.unit_id,
+      start_date: validatedData.start_date,
+      end_date: validatedData.end_date,
+      monthly_rate: validatedData.monthly_rate,
         security_deposit: validatedData.security_deposit,
         late_fee_rate: validatedData.late_fee_rate,
         auto_renew: validatedData.auto_renew,

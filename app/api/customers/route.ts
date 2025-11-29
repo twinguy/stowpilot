@@ -68,15 +68,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = customerFormSchema.parse(body)
 
-    const { data, error } = await supabase
-      .from('customers')
-      .insert({
-        owner_id: user.id,
-        first_name: validatedData.first_name,
-        last_name: validatedData.last_name,
-        email: validatedData.email || null,
-        phone: validatedData.phone || null,
-        address: validatedData.address || null,
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('customers') as any).insert({
+      owner_id: user.id,
+      first_name: validatedData.first_name,
+      last_name: validatedData.last_name,
+      email: validatedData.email || null,
+      phone: validatedData.phone || null,
+      address: validatedData.address || null,
         emergency_contact: validatedData.emergency_contact || null,
         identification: validatedData.identification || null,
         credit_score: validatedData.credit_score || null,

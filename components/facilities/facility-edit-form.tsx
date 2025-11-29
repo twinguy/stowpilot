@@ -3,7 +3,8 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { FacilityForm } from './facility-form'
-import { type Facility, type FacilityFormData } from '@/types'
+import { type Facility } from '@/types'
+import { type FacilityFormData } from '@/lib/validations/facility'
 
 interface FacilityEditFormProps {
   facility: Facility

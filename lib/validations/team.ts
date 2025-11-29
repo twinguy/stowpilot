@@ -4,9 +4,7 @@ import { z } from 'zod'
 export const teamInvitationSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   full_name: z.string().min(1, 'Full name is required'),
-  role: z.enum(['manager', 'staff'], {
-    required_error: 'Please select a role',
-  }),
+  role: z.enum(['manager', 'staff']),
   permissions: z.record(z.string(), z.boolean()).optional(),
 })
 

@@ -94,26 +94,32 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify invoice ownership
-    const { data: invoice } = await supabase
-      .from('invoices')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: invoiceData } = await (supabase.from('invoices') as any)
       .select('*, customers!inner(owner_id)')
       .eq('id', validatedData.invoice_id)
       .eq('customers.owner_id', user.id)
       .single()
 
-    if (!invoice) {
+    if (!invoiceData) {
       return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
     }
 
-    const { data: payment, error: paymentError } = await supabase
-      .from('payments')
-      .insert({
-        invoice_id: validatedData.invoice_id,
-        customer_id: validatedData.customer_id,
-        amount: validatedData.amount,
-        payment_method_id: validatedData.payment_method_id || null,
-        transaction_id: validatedData.transaction_id || null,
-        notes: validatedData.notes || null,
+    const invoice = invoiceData as {
+      amount_paid: number
+      amount_due: number
+      status: string
+      paid_at: string | null
+    }
+
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: payment, error: paymentError } = await (supabase.from('payments') as any).insert({
+      invoice_id: validatedData.invoice_id,
+      customer_id: validatedData.customer_id,
+      amount: validatedData.amount,
+      payment_method_id: validatedData.payment_method_id || null,
+      transaction_id: validatedData.transaction_id || null,
+      notes: validatedData.notes || null,
         status: validatedData.status,
         processed_at: validatedData.status === 'completed' ? new Date().toISOString() : null,
       })

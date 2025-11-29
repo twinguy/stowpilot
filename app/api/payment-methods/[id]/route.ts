@@ -61,16 +61,18 @@ export async function PATCH(
     const validatedData = paymentMethodUpdateSchema.parse(body)
 
     // Verify payment method ownership
-    const { data: existingPaymentMethod } = await supabase
-      .from('payment_methods')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: existingPaymentMethodData } = await (supabase.from('payment_methods') as any)
       .select('*, customers!inner(owner_id)')
       .eq('id', id)
       .eq('customers.owner_id', user.id)
       .single()
 
-    if (!existingPaymentMethod) {
+    if (!existingPaymentMethodData) {
       return NextResponse.json({ error: 'Payment method not found' }, { status: 404 })
     }
+
+    const existingPaymentMethod = existingPaymentMethodData as { customer_id: string }
 
     // If setting as default, unset other defaults for this customer
     if (validatedData.is_default === true) {

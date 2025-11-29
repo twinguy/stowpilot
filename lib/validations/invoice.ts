@@ -11,7 +11,7 @@ export const invoiceFormSchema = z.object({
   due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
   payment_method_id: z.string().uuid('Invalid payment method ID').optional().nullable(),
   stripe_invoice_id: z.string().optional().nullable(),
-  status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']).default('draft'),
+  status: z.enum(['draft', 'sent', 'paid', 'overdue', 'cancelled']),
 })
 
 export type InvoiceFormData = z.infer<typeof invoiceFormSchema>

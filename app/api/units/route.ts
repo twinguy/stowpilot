@@ -91,8 +91,8 @@ export async function POST(request: NextRequest) {
         photos: unit.photos || [],
       }))
 
-      const { data, error } = await supabase
-        .from('units')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      const { data, error } = await (supabase.from('units') as any)
         .insert(unitsToInsert)
         .select()
 
@@ -123,15 +123,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Facility not found' }, { status: 404 })
       }
 
-      const { data, error } = await supabase
-        .from('units')
-        .insert({
-          facility_id: validatedData.facility_id,
-          unit_number: validatedData.unit_number,
-          size: validatedData.size,
-          type: validatedData.type,
-          floor_level: validatedData.floor_level,
-          features: validatedData.features,
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      const { data, error } = await (supabase.from('units') as any).insert({
+        facility_id: validatedData.facility_id,
+        unit_number: validatedData.unit_number,
+        size: validatedData.size,
+        type: validatedData.type,
+        floor_level: validatedData.floor_level,
+        features: validatedData.features,
           monthly_rate: validatedData.monthly_rate,
           photos: validatedData.photos,
           notes: validatedData.notes,

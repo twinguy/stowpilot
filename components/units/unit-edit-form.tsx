@@ -3,7 +3,8 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { UnitForm } from './unit-form'
-import { type Unit, type Facility, type UnitFormData } from '@/types'
+import { type Unit, type Facility } from '@/types'
+import { type UnitFormData } from '@/lib/validations/unit'
 
 interface UnitEditFormProps {
   unit: Unit

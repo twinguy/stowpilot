@@ -57,16 +57,18 @@ export async function PATCH(
     }
 
     // Verify rental ownership
-    const { data: existingRental } = await supabase
-      .from('rentals')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: existingRentalData } = await (supabase.from('rentals') as any)
       .select('id, unit_id, status')
       .eq('id', id)
       .eq('owner_id', user.id)
       .single()
 
-    if (!existingRental) {
+    if (!existingRentalData) {
       return NextResponse.json({ error: 'Rental not found' }, { status: 404 })
     }
+
+    const existingRental = existingRentalData as { id: string; unit_id: string; status: string }
 
     const body = await request.json()
     const validatedData = rentalFormSchema.partial().parse(body)
@@ -130,16 +132,18 @@ export async function DELETE(
     }
 
     // Verify rental ownership and get unit_id
-    const { data: rental } = await supabase
-      .from('rentals')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: rentalData } = await (supabase.from('rentals') as any)
       .select('id, unit_id')
       .eq('id', id)
       .eq('owner_id', user.id)
       .single()
 
-    if (!rental) {
+    if (!rentalData) {
       return NextResponse.json({ error: 'Rental not found' }, { status: 404 })
     }
+
+    const rental = rentalData as { id: string; unit_id: string }
 
     // Delete rental
     // Type assertion needed because TypeScript can't infer the table type from Database

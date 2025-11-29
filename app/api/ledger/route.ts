@@ -143,20 +143,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const { data, error } = await supabase
-      .from('ledger_entries')
-      .insert({
-        owner_id: user.id,
-        facility_id: validatedData.facility_id || null,
-        customer_id: validatedData.customer_id || null,
-        rental_id: validatedData.rental_id || null,
-        type: validatedData.type,
-        category: validatedData.category,
-        description: validatedData.description,
-        amount: validatedData.amount,
-        date: validatedData.date,
-        payment_id: validatedData.payment_id || null,
-      })
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('ledger_entries') as any).insert({
+      owner_id: user.id,
+      facility_id: validatedData.facility_id || null,
+      customer_id: validatedData.customer_id || null,
+      rental_id: validatedData.rental_id || null,
+      type: validatedData.type,
+      category: validatedData.category,
+      description: validatedData.description,
+      amount: validatedData.amount,
+      date: validatedData.date,
+      payment_id: validatedData.payment_id || null,
+    })
       .select()
       .single()
 

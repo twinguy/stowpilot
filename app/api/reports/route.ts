@@ -13,26 +13,24 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all data in parallel
+    // Type assertions needed because TypeScript can't infer the table types from Database
     const [facilitiesResult, unitsResult, customersResult, rentalsResult, ledgerResult, maintenanceResult] = await Promise.all([
-      supabase.from('facilities').select('*').eq('owner_id', user.id),
-      supabase
-        .from('units')
+      (supabase.from('facilities') as any).select('*').eq('owner_id', user.id),
+      (supabase.from('units') as any)
         .select('*, facilities!inner(owner_id)')
         .eq('facilities.owner_id', user.id),
-      supabase.from('customers').select('*').eq('owner_id', user.id),
-      supabase
-        .from('rentals')
+      (supabase.from('customers') as any).select('*').eq('owner_id', user.id),
+      (supabase.from('rentals') as any)
         .select('*, customers!inner(owner_id)')
         .eq('customers.owner_id', user.id)
         .eq('status', 'active'),
-      supabase.from('ledger_entries').select('*').eq('owner_id', user.id),
-      supabase
-        .from('maintenance_requests')
+      (supabase.from('ledger_entries') as any).select('*').eq('owner_id', user.id),
+      (supabase.from('maintenance_requests') as any)
         .select('*, facilities!inner(owner_id)')
         .eq('facilities.owner_id', user.id),
     ])
 
-    const facilities = facilitiesResult.data || []
+    const facilities = (facilitiesResult.data || []) as Array<{ id: string; name: string }>
     const units = unitsResult.data || []
     const customers = customersResult.data || []
     const rentals = rentalsResult.data || []
@@ -94,7 +92,7 @@ export async function GET(request: NextRequest) {
         return (completed - created) / (1000 * 60 * 60 * 24) // days
       })
     const averageCompletionTime = completionTimes.length > 0
-      ? completionTimes.reduce((sum, time) => sum + time, 0) / completionTimes.length
+      ? completionTimes.reduce((sum: number, time: number) => sum + time, 0) / completionTimes.length
       : null
 
     const requestsByStatus: Record<string, number> = {}
@@ -109,7 +107,7 @@ export async function GET(request: NextRequest) {
 
     const totalMaintenanceCost = maintenanceRequests
       .filter((r: any) => r.cost)
-      .reduce((sum, r: any) => sum + parseFloat(r.cost || 0), 0)
+      .reduce((sum: number, r: any) => sum + parseFloat(r.cost || 0), 0)
 
     const maintenanceMetrics = {
       total_requests: maintenanceRequests.length,
@@ -125,11 +123,11 @@ export async function GET(request: NextRequest) {
     // Calculate analytics metrics
     const totalRevenue = ledgerEntries
       .filter((e: any) => e.type === 'income')
-      .reduce((sum, e: any) => sum + parseFloat(e.amount), 0)
+      .reduce((sum: number, e: any) => sum + parseFloat(e.amount), 0)
     
     const totalExpenses = ledgerEntries
       .filter((e: any) => e.type === 'expense')
-      .reduce((sum, e: any) => sum + parseFloat(e.amount), 0)
+      .reduce((sum: number, e: any) => sum + parseFloat(e.amount), 0)
 
     const averageOccupancyRate = occupancyData.length > 0
       ? occupancyData.reduce((sum, d) => sum + d.occupancy_rate, 0) / occupancyData.length

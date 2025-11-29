@@ -65,7 +65,7 @@ export function RentalTable({ rentals }: RentalTableProps) {
           {rentals.map((rental: any) => {
             const customer = rental.customers
             const unit = rental.units
-            const status = statusConfig[rental.status]
+            const status = statusConfig[rental.status as Rental['status']]
 
             return (
               <TableRow key={rental.id}>

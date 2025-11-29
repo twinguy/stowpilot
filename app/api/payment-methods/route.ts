@@ -88,15 +88,14 @@ export async function POST(request: NextRequest) {
         .eq('is_default', true)
     }
 
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .insert({
-        customer_id: validatedData.customer_id,
-        type: validatedData.type,
-        provider: validatedData.provider,
-        provider_payment_method_id: validatedData.provider_payment_method_id || null,
-        last_four: validatedData.last_four || null,
-        expiry_month: validatedData.expiry_month || null,
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('payment_methods') as any).insert({
+      customer_id: validatedData.customer_id,
+      type: validatedData.type,
+      provider: validatedData.provider,
+      provider_payment_method_id: validatedData.provider_payment_method_id || null,
+      last_four: validatedData.last_four || null,
+      expiry_month: validatedData.expiry_month || null,
         expiry_year: validatedData.expiry_year || null,
         is_default: validatedData.is_default,
         status: validatedData.status,

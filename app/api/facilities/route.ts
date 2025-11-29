@@ -71,15 +71,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = facilityFormSchema.parse(body)
 
-    const { data, error } = await supabase
-      .from('facilities')
-      .insert({
-        owner_id: user.id,
-        name: validatedData.name,
-        address: validatedData.address,
-        amenities: validatedData.amenities,
-        contact_info: validatedData.contact_info,
-        operating_hours: validatedData.operating_hours,
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('facilities') as any).insert({
+      owner_id: user.id,
+      name: validatedData.name,
+      address: validatedData.address,
+      amenities: validatedData.amenities,
+      contact_info: validatedData.contact_info,
+      operating_hours: validatedData.operating_hours,
         photos: validatedData.photos,
         notes: validatedData.notes,
         status: validatedData.status,

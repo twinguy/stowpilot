@@ -103,8 +103,8 @@ export function ProfileSettings() {
         return
       }
 
-      const { error: updateError } = await supabase
-        .from('profiles')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      const { error: updateError } = await (supabase.from('profiles') as any)
         .update({
           full_name: data.full_name,
           business_name: data.business_name || null,

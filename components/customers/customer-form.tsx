@@ -115,7 +115,7 @@ export function CustomerForm({ customer, onSubmit }: CustomerFormProps) {
       if (processedData.identification) {
         const cleaned = {
           type:
-            processedData.identification.type === '' || processedData.identification.type === null
+            processedData.identification.type === null || processedData.identification.type === undefined
               ? undefined
               : processedData.identification.type,
           number:
@@ -368,7 +368,7 @@ export function CustomerForm({ customer, onSubmit }: CustomerFormProps) {
                       const current = form.getValues('identification')
                       form.setValue('identification', {
                         ...(current || {}),
-                        type: value === '' ? undefined : value,
+                        type: value === '' ? undefined : (value as 'drivers_license' | 'passport' | 'state_id' | 'other' | undefined),
                       })
                     }}
                     value={form.watch('identification')?.type || ''}

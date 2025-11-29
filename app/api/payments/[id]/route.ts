@@ -61,15 +61,22 @@ export async function PATCH(
     const validatedData = paymentUpdateSchema.parse(body)
 
     // Verify payment ownership
-    const { data: existingPayment } = await supabase
-      .from('payments')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: existingPaymentData } = await (supabase.from('payments') as any)
       .select('*, customers!inner(owner_id), invoices!inner(id, amount_due, amount_paid, status, paid_at)')
       .eq('id', id)
       .eq('customers.owner_id', user.id)
       .single()
 
-    if (!existingPayment) {
+    if (!existingPaymentData) {
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 })
+    }
+
+    const existingPayment = existingPaymentData as {
+      processed_at: string | null
+      invoice_id: string
+      invoices: { id: string; amount_due: number; status: string; paid_at: string | null }
+      amount: number
     }
 
     const updateData: Record<string, unknown> = {}
@@ -102,8 +109,8 @@ export async function PATCH(
       updateData.processed_at = validatedData.processed_at
     }
 
-    const { data, error } = await supabase
-      .from('payments')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data, error } = await (supabase.from('payments') as any)
       .update(updateData)
       .eq('id', id)
       .select()
@@ -116,13 +123,13 @@ export async function PATCH(
     // Update invoice if payment status changed
     if (validatedData.status !== undefined && existingPayment.invoice_id) {
       const invoice = existingPayment.invoices as { id: string; amount_due: number; status: string; paid_at: string | null }
-      const { data: invoicePayments } = await supabase
-        .from('payments')
+      // Type assertion needed because TypeScript can't infer the table type from Database
+      const { data: invoicePayments } = await (supabase.from('payments') as any)
         .select('amount')
         .eq('invoice_id', invoice.id)
         .eq('status', 'completed')
 
-      const totalPaid = invoicePayments?.reduce((sum, p) => sum + p.amount, 0) || 0
+      const totalPaid = (invoicePayments as Array<{ amount: number }> | null)?.reduce((sum: number, p: { amount: number }) => sum + p.amount, 0) || 0
       const invoiceStatus = totalPaid >= invoice.amount_due ? 'paid' : invoice.status
 
       // Type assertion needed because TypeScript can't infer the table type from Database

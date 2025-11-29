@@ -58,15 +58,17 @@ export async function PATCH(
     const validatedData = unitFormSchema.partial().parse(body)
 
     // Verify unit ownership through facility
-    const { data: unit } = await supabase
-      .from('units')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: unitData } = await (supabase.from('units') as any)
       .select('facility_id, facilities!inner(owner_id)')
       .eq('id', id)
       .single()
 
-    if (!unit) {
+    if (!unitData) {
       return NextResponse.json({ error: 'Unit not found' }, { status: 404 })
     }
+
+    const unit = unitData as { facility_id: string }
 
     // Type assertion needed because TypeScript can't infer the table type from Database
     const { data, error } = await (supabase.from('units') as any)
@@ -109,15 +111,17 @@ export async function DELETE(
     const { id } = await params
 
     // Get facility_id before deletion
-    const { data: unit } = await supabase
-      .from('units')
+    // Type assertion needed because TypeScript can't infer the table type from Database
+    const { data: unitData } = await (supabase.from('units') as any)
       .select('facility_id, facilities!inner(owner_id)')
       .eq('id', id)
       .single()
 
-    if (!unit) {
+    if (!unitData) {
       return NextResponse.json({ error: 'Unit not found' }, { status: 404 })
     }
+
+    const unit = unitData as { facility_id: string }
 
     // Type assertion needed because TypeScript can't infer the table type from Database
     const { error } = await (supabase.from('units') as any).delete().eq('id', id)

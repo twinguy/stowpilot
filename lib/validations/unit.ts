@@ -12,15 +12,13 @@ export const unitFormSchema = z.object({
   facility_id: z.string().uuid('Invalid facility ID'),
   unit_number: z.string().min(1, 'Unit number is required').max(50, 'Unit number is too long'),
   size: unitSizeSchema,
-  type: z.enum(['standard', 'climate_controlled', 'outdoor', 'vehicle']).default('standard'),
-  floor_level: z.number().int().min(0, 'Floor level cannot be negative').default(1),
-  features: z.array(z.string()).default([]),
+  type: z.enum(['standard', 'climate_controlled', 'outdoor', 'vehicle']),
+  floor_level: z.number().int().min(0, 'Floor level cannot be negative'),
+  features: z.array(z.string()),
   monthly_rate: z.number().positive('Monthly rate must be positive'),
-  photos: z.array(z.string().url('Invalid photo URL')).default([]),
+  photos: z.array(z.string().url('Invalid photo URL')),
   notes: z.string().optional(),
-  status: z
-    .enum(['available', 'occupied', 'reserved', 'maintenance', 'out_of_service'])
-    .default('available'),
+  status: z.enum(['available', 'occupied', 'reserved', 'maintenance', 'out_of_service']),
 })
 
 export type UnitFormData = z.infer<typeof unitFormSchema>

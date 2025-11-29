@@ -34,11 +34,9 @@ export const customerFormSchema = z.object({
   emergency_contact: emergencyContactSchema,
   identification: identificationSchema,
   credit_score: z.number().int().min(300).max(850).optional().nullable(),
-  background_check_status: z
-    .enum(['pending', 'approved', 'rejected', 'not_required'])
-    .default('pending'),
+  background_check_status: z.enum(['pending', 'approved', 'rejected', 'not_required']),
   notes: z.string().optional().nullable(),
-  status: z.enum(['active', 'inactive', 'delinquent']).default('active'),
+  status: z.enum(['active', 'inactive', 'delinquent']),
 })
 
 export type CustomerFormData = z.infer<typeof customerFormSchema>
